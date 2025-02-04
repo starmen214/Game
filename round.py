@@ -5,15 +5,19 @@ class Round(pygame.sprite.Sprite):
     def __init__(self, x, speed, group):
         super().__init__(group)
         self.speed = speed
-        self.image = pygame.image.load('round.png').convert_alpha()
+        self.image = pygame.image.load("round.png").convert_alpha()
         self.rect = self.image.get_rect(center=(x, 410))
         self.add(group)
 
-    def update(self, *args):
-        if self.rect.y < args[0][1]:
+    def update(self, enemy_group, plane, *args):
+        if self.rect.y > 0:
             self.rect.y -= self.speed
         else:
             self.kill()
+        for enemy in enemy_group:
+            if self.rect.colliderect(enemy.rect):
+                enemy.kill()
+                plane.kill_count += 1
 
 
 def create_round(group, x):

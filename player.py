@@ -7,6 +7,8 @@ class Plane(pygame.sprite.Sprite):
         self.image = pygame.image.load('plane.png').convert_alpha()
         self.rect = self.image.get_rect(center=(x, 440))
         self.speed = speed
+        self.kill_count = 0
+        self.alive = True
 
     def update(self, event):
         speed = 0
@@ -20,6 +22,12 @@ class Plane(pygame.sprite.Sprite):
                 speed = 0
         if 60 < self.rect.x < 480 - 60:
             self.rect.x += speed
+
+    def collide_with_enemies(self, enemy_group):
+        for enemy in enemy_group:
+            if self.rect.colliderect(enemy.rect):
+                self.alive = False
+                self.kill()
 
 
 def create_player(group):
