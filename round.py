@@ -1,4 +1,5 @@
 import pygame
+from explosion import Explosion
 
 
 class Round(pygame.sprite.Sprite):
@@ -9,13 +10,14 @@ class Round(pygame.sprite.Sprite):
         self.rect = self.image.get_rect(center=(x, 410))
         self.add(group)
 
-    def update(self, enemy_group, plane, *args):
+    def update(self, enemy_group, explosions_group, plane, *args):
         if self.rect.y > 0:
             self.rect.y -= self.speed
         else:
             self.kill()
         for enemy in enemy_group:
             if self.rect.colliderect(enemy.rect):
+                explosions_group.add(Explosion(enemy.rect.center, 'lg'))
                 enemy.kill()
                 plane.kill_count += 1
 

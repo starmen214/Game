@@ -15,15 +15,16 @@ pygame.init()
 pygame.font.init()
 counter_font = pygame.font.SysFont(None, 30)
 lose_font = pygame.font.SysFont(None, 70)
-pygame.time.set_timer(pygame.USEREVENT, 250)
-pygame.time.set_timer(SPAWN_ENEMIES_EVENT, 400)
 screen_size = (640, 480)
 screen = pygame.display.set_mode(screen_size)
 clock = pygame.time.Clock()
 player = pygame.sprite.Group()
 rounds = pygame.sprite.Group()
 enemies = pygame.sprite.Group()
+explosions = pygame.sprite.Group()
 menu = Menu(screen, counter_font)
+pygame.time.set_timer(pygame.USEREVENT, 250)
+pygame.time.set_timer(SPAWN_ENEMIES_EVENT, 200)
 plane = create_player(player)
 finish_screen = FinishScreen(screen, menu, plane, lose_font)
 connection = sqlite3.connect("records.db")
@@ -38,7 +39,10 @@ last_record = cursor.execute(
     """SELECT last_record FROM Records WHERE id=?""", (1,)
 ).fetchone()
 if not last_record:
-    cursor.execute("""INSERT INTO Records (id, last_record) VALUES (?, ?)""", (1, 0))
+    cursor.execute(
+        """INSERT INTO Records (id, last_record) VALUES (?, ?)""",
+        (1, 0)
+    )
     last_record = 0
 else:
     last_record = last_record[0]
@@ -52,7 +56,9 @@ while True:
             if plane.alive:
                 if event.type == pygame.USEREVENT:
                     if plane.alive:
-                        create_round(rounds, plane.rect.x + (plane.rect.width / 2) - 10)
+                        create_round(
+                            rounds, plane.rect.x + (plane.rect.width / 2) - 10
+                        )
                 if event.type == SPAWN_ENEMIES_EVENT:
                     if plane.alive:
                         create_enemy(enemies)
@@ -76,8 +82,10 @@ while True:
             player.draw(screen)
         rounds.draw(screen)
         enemies.draw(screen)
+        explosions.draw(screen)
         enemies.update(screen_size)
-        rounds.update(enemies, plane, screen_size)
+        explosions.update()
+        rounds.update(enemies, explosions, plane, screen_size)
         player.update(event)
         plane.collide_with_enemies(enemies)
         show_text(

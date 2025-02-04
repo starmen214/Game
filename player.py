@@ -7,29 +7,46 @@ class Plane(pygame.sprite.Sprite):
         self.image = pygame.image.load("media/plane.png").convert_alpha()
         self.rect = self.image.get_rect(center=(x, 440))
         self.speed = speed
+        self.can_move = True
+        self.vx = 0
         self.kill_count = 0
         self.alive = True
 
     def update(self, event):
-        speed = 0
-        if event.type == pygame.KEYDOWN:
-            if event.key in [pygame.K_LEFT, pygame.K_a]:
-                speed = -self.speed
-            if event.key in [pygame.K_RIGHT, pygame.K_d]:
-                speed = abs(self.speed)
-        if event.type == pygame.KEYUP:
-            if event.key in [pygame.K_LEFT, pygame.K_a] or event.key in [
-                pygame.K_RIGHT,
-                pygame.K_d,
-            ]:
-                speed = 0
-        if 60 < self.rect.x < 480 - 60:
-            self.rect.x += speed
+        if self.can_move:
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_a:
+                    self.move_left()
+                elif event.key == pygame.K_LEFT:
+                    self.move_left()
+                elif event.key == pygame.K_RIGHT:
+                    self.move_right()
+                elif event.key == pygame.K_d:
+                    self.move_right()
+                else:
+                    self.vx = 0
+                if not self.check():
+                    self.rect.x += self.vx
 
     def collide_with_enemies(self, enemy_group):
         for enemy in enemy_group:
             if self.rect.colliderect(enemy.rect):
                 self.alive = False
+
+    def move_left(self):
+        if self.rect.x > 0:
+            self.vx = -self.speed
+
+    def move_right(self):
+        if self.rect.x < (320 - self.rect.width):
+            self.vx = self.speed
+
+    def check(self):
+        if 0 <= self.rect.x <= 640 - self.rect.width:
+            return False
+        else:
+            self.can_move = False
+        return True
 
 
 def create_player(group):
