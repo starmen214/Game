@@ -5,7 +5,7 @@ class Round(pygame.sprite.Sprite):
     def __init__(self, x, speed, group):
         super().__init__(group)
         self.speed = speed
-        self.image = pygame.image.load("round.png").convert_alpha()
+        self.image = pygame.image.load("media/round.png").convert_alpha()
         self.rect = self.image.get_rect(center=(x, 410))
         self.add(group)
 

@@ -7,7 +7,7 @@ class Enemy(pygame.sprite.Sprite):
         super().__init__(group)
         self.speed = speed
         self.image = pygame.image.load(
-            choice(["enemy1.png", "enemy2.png", "enemy3.png"])
+            choice(["media/enemy1.png", "media/enemy2.png", "media/enemy3.png"])
         ).convert_alpha()
         self.rect = self.image.get_rect(center=(x, 0))
         self.add(group)

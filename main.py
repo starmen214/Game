@@ -1,18 +1,12 @@
 import sys
 import pygame
-from player import Plane, create_player
-from round import Round, create_round
-from enemy import Enemy, create_enemy
-
-
-class Game:
-    pass
-
-
-def show_text(screen, x, y, font, msg, color,):
-    text = font.render(msg, True, color)
-    text_rect = text.get_rect(center=(x, y))
-    screen.blit(text, text_rect)
+import sqlite3
+from player import create_player
+from round import create_round
+from enemy import create_enemy
+from menu import Menu
+from finish_screen import FinishScreen
+from utils import show_text
 
 
 FPS = 60
@@ -22,34 +16,93 @@ pygame.font.init()
 counter_font = pygame.font.SysFont(None, 30)
 lose_font = pygame.font.SysFont(None, 70)
 pygame.time.set_timer(pygame.USEREVENT, 250)
-pygame.time.set_timer(SPAWN_ENEMIES_EVENT, 350)
+pygame.time.set_timer(SPAWN_ENEMIES_EVENT, 400)
 screen_size = (640, 480)
 screen = pygame.display.set_mode(screen_size)
 clock = pygame.time.Clock()
 player = pygame.sprite.Group()
 rounds = pygame.sprite.Group()
 enemies = pygame.sprite.Group()
+menu = Menu(screen, counter_font)
 plane = create_player(player)
-create_round(rounds, plane.rect.x + (plane.rect.width / 2) - 10)
+finish_screen = FinishScreen(screen, menu, plane, lose_font)
+connection = sqlite3.connect("records.db")
+cursor = connection.cursor()
+cursor.execute(
+    """
+    CREATE TABLE IF NOT EXISTS
+    Records (id INTEGER PRIMARY KEY, last_record INTEGER)
+    """
+)
+last_record = cursor.execute(
+    """SELECT last_record FROM Records WHERE id=?""", (1,)
+).fetchone()
+if not last_record:
+    cursor.execute("""INSERT INTO Records (id, last_record) VALUES (?, ?)""", (1, 0))
+    last_record = 0
+else:
+    last_record = last_record[0]
+connection.commit()
+connection.close()
 while True:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             sys.exit(1)
-        if event.type == pygame.USEREVENT:
+        if menu.is_started:
             if plane.alive:
-                create_round(rounds, plane.rect.x + (plane.rect.width / 2) - 10)
-        if event.type == SPAWN_ENEMIES_EVENT:
-            create_enemy(enemies)
+                if event.type == pygame.USEREVENT:
+                    if plane.alive:
+                        create_round(rounds, plane.rect.x + (plane.rect.width / 2) - 10)
+                if event.type == SPAWN_ENEMIES_EVENT:
+                    if plane.alive:
+                        create_enemy(enemies)
+            else:
+                if event.type == pygame.MOUSEMOTION:
+                    finish_screen.check_mouse_motion(event.pos)
+                if event.type == pygame.MOUSEBUTTONDOWN:
+                    finish_screen.check_mouse_down(event.pos)
+                if event.type == pygame.MOUSEBUTTONUP:
+                    finish_screen.check_mouse_up()
+        else:
+            if event.type == pygame.MOUSEMOTION:
+                menu.check_mouse_motion(event.pos)
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                menu.check_mouse_down(event.pos)
+            if event.type == pygame.MOUSEBUTTONUP:
+                menu.check_mouse_up()
     screen.fill((0, 0, 0))
-    player.draw(screen)
-    rounds.draw(screen)
-    enemies.draw(screen)
-    enemies.update(screen_size)
-    rounds.update(enemies, plane, screen_size)
-    player.update(event)
-    plane.collide_with_enemies(enemies)
-    show_text(screen, 550, 20, counter_font, f"Врагов убито: {plane.kill_count}", (255, 255, 255))
-    if not plane.alive:
-        show_text(screen, 330, 240, lose_font, "WASTED", (255, 0, 0))
+    if menu.is_started:
+        if plane.alive:
+            player.draw(screen)
+        rounds.draw(screen)
+        enemies.draw(screen)
+        enemies.update(screen_size)
+        rounds.update(enemies, plane, screen_size)
+        player.update(event)
+        plane.collide_with_enemies(enemies)
+        show_text(
+            screen,
+            550,
+            20,
+            counter_font,
+            f"Врагов убито: {plane.kill_count}",
+            (255, 255, 255),
+        )
+        if not plane.alive:
+            if plane.kill_count > last_record:
+                connection = sqlite3.connect("records.db")
+                cursor = connection.cursor()
+                connection.commit()
+                cursor.execute(
+                    """UPDATE Records SET last_record = ? WHERE id=?""",
+                    (plane.kill_count, 1),
+                )
+                connection.commit()
+                connection.close()
+                last_record = max(plane.kill_count, last_record)
+            plane.kill_count = 0
+            finish_screen.render()
+    else:
+        menu.render(last_record)
     pygame.display.update()
     clock.tick(FPS)
