@@ -14,9 +14,9 @@ class Menu:
             50,
             "Начать",
             screen,
-            (255, 0, 0),
-            (255, 255, 255),
-            (255, 50, 50),
+            (0, 0, 0),
+            (0, 0, 0),
+            (0, 0, 0),
             3,
             25,
             self.start_game,
@@ -29,9 +29,9 @@ class Menu:
             50,
             "Выйти",
             screen,
-            (255, 0, 0),
-            (255, 255, 255),
-            (255, 50, 50),
+            (0, 0, 0),
+            (0, 0, 0),
+            (0, 0, 0),
             3,
             25,
             self.exit_game,
@@ -44,9 +44,9 @@ class Menu:
             50,
             "Лёгкая",
             screen,
-            (255, 0, 0),
-            (255, 255, 255),
-            (255, 50, 50),
+            (0, 0, 0),
+            (0, 0, 0),
+            (0, 0, 0),
             3,
             25,
             self.set_easy,
@@ -59,9 +59,9 @@ class Menu:
             50,
             "Средняя",
             screen,
-            (255, 0, 0),
-            (255, 255, 255),
-            (255, 50, 50),
+            (0, 0, 0),
+            (0, 0, 0),
+            (0, 0, 0),
             3,
             25,
             self.set_normal,
@@ -74,14 +74,15 @@ class Menu:
             50,
             "Хардкор",
             screen,
-            (255, 0, 0),
-            (255, 255, 255),
-            (255, 50, 50),
+            (0, 0, 0),
+            (0, 0, 0),
+            (0, 0, 0),
             3,
             25,
             self.set_hard,
             center_text=True,
         )
+
         self.screen = screen
         self.font = font
         self.start_buttons = [self.start_button, self.exit_button]
@@ -114,6 +115,7 @@ class Menu:
         self.is_started = True
 
     def render(self, last_record):
+        show_text(self.screen, 200, 450, self.font, "*управление на кнопки стрелок", (0, 0, 0))
         if not self.choosing_level:
             self.start_button.render()
             self.exit_button.render()
@@ -137,6 +139,7 @@ class Menu:
                 'Выберите сложность:',
                 (255, 255, 255)
             )
+
 
     def check_mouse_motion(self, pos):
         if not self.choosing_level:

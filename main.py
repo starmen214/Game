@@ -10,13 +10,19 @@ from utils import show_text
 
 
 FPS = 60
+pygame.mixer.init()
+pygame.mixer.music.load('media/game.mp3')
+pygame.mixer.music.play()
+pygame.mixer.music.play(-1)
 SPAWN_ENEMIES_EVENT = pygame.USEREVENT + 1
 pygame.init()
 pygame.font.init()
 counter_font = pygame.font.SysFont(None, 30)
 lose_font = pygame.font.SysFont(None, 70)
 screen_size = (640, 480)
-bg = pygame.image.load("media/sky.jpg")
+pygame.display.set_caption("Небесные тузы")
+sky_img = pygame.image.load("media/sky.jpg")
+plane_img = pygame.image.load('media/plane.jpg')
 screen = pygame.display.set_mode(screen_size)
 clock = pygame.time.Clock()
 player = pygame.sprite.Group()
@@ -80,7 +86,7 @@ while True:
     screen.fill((0, 0, 0))
     if menu.is_started:
         if plane.alive:
-            screen.blit(bg, (0, 0))
+            screen.blit(sky_img, (0, 0))
             player.draw(screen)
         rounds.draw(screen)
         enemies.draw(screen)
@@ -99,6 +105,8 @@ while True:
             (255, 255, 255),
         )
         if not plane.alive:
+
+            screen.blit(plane_img, (0, 0))
             if plane.kill_count > last_record:
                 connection = sqlite3.connect("records.db")
                 cursor = connection.cursor()
@@ -113,6 +121,7 @@ while True:
             plane.kill_count = 0
             finish_screen.render()
     else:
+        screen.blit(sky_img, (0, 0))
         menu.render(last_record)
     pygame.display.update()
     clock.tick(FPS)

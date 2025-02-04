@@ -12,9 +12,9 @@ class FinishScreen:
             50,
             "Играть снова",
             screen,
-            (255, 0, 0),
             (255, 255, 255),
-            (255, 50, 50),
+            (255, 255, 255),
+            (255, 255, 255),
             3,
             25,
             self.play_again,
@@ -27,9 +27,9 @@ class FinishScreen:
             50,
             "В меню",
             screen,
-            (255, 0, 0),
             (255, 255, 255),
-            (255, 50, 50),
+            (255, 255, 255),
+            (255, 255, 255),
             3,
             25,
             self.to_menu,
@@ -62,7 +62,7 @@ class FinishScreen:
             btn.check_mouse_motion(pos)
 
     def render(self):
-        show_text(self.screen, 330, 240, self.font, "ВЫ ПОГИБЛИ", (255, 0, 0))
+        show_text(self.screen, 330, 240, self.font, "ВЫ ПОГИБЛИ", (255, 255, 255))
         self.play_again_btn.render()
         self.to_menu_btn.render()
 
