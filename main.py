@@ -1,4 +1,5 @@
 import sys
+import os
 import pygame
 import sqlite3
 from player import create_player
@@ -6,12 +7,16 @@ from round import create_round
 from enemy import create_enemy
 from menu import Menu
 from finish_screen import FinishScreen
-from utils import show_text
+from utils import show_text, resource_path
 
 
+dir_path = os.path.join(os.environ['APPDATA'], 'YOUR_APP_NAME')
+if not os.path.exists(dir_path):
+    os.makedirs(dir_path)
+db_path = os.path.join(dir_path, 'records.sqlite')
 FPS = 60
 pygame.mixer.init()
-pygame.mixer.music.load('media/game.mp3')
+pygame.mixer.music.load(resource_path('media/game.mp3'))
 pygame.mixer.music.play()
 pygame.mixer.music.play(-1)
 SPAWN_ENEMIES_EVENT = pygame.USEREVENT + 1
@@ -21,8 +26,8 @@ counter_font = pygame.font.SysFont(None, 30)
 lose_font = pygame.font.SysFont(None, 70)
 screen_size = (640, 480)
 pygame.display.set_caption("Небесные тузы")
-sky_img = pygame.image.load("media/sky.jpg")
-plane_img = pygame.image.load('media/plane.jpg')
+sky_img = pygame.image.load(resource_path("media/sky.jpg"))
+plane_img = pygame.image.load(resource_path('media/plane.jpg'))
 screen = pygame.display.set_mode(screen_size)
 clock = pygame.time.Clock()
 player = pygame.sprite.Group()
@@ -34,14 +39,14 @@ pygame.time.set_timer(pygame.USEREVENT, 250)
 pygame.time.set_timer(SPAWN_ENEMIES_EVENT, 200)
 plane = create_player(player)
 finish_screen = FinishScreen(screen, menu, plane, lose_font)
-connection = sqlite3.connect("records.db")
+connection = sqlite3.connect(resource_path(db_path))
 cursor = connection.cursor()
 cursor.execute(
     """
-    CREATE TABLE IF NOT EXISTS
-    Records (id INTEGER PRIMARY KEY, last_record INTEGER)
+    CREATE TABLE IF NOT EXISTS Records (id INTEGER PRIMARY KEY, last_record INTEGER)
     """
 )
+connection.commit()
 last_record = cursor.execute(
     """SELECT last_record FROM Records WHERE id=?""", (1,)
 ).fetchone()
@@ -108,7 +113,7 @@ while True:
 
             screen.blit(plane_img, (0, 0))
             if plane.kill_count > last_record:
-                connection = sqlite3.connect("records.db")
+                connection = sqlite3.connect(resource_path(db_path))
                 cursor = connection.cursor()
                 connection.commit()
                 cursor.execute(

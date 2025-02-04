@@ -1,4 +1,5 @@
 import pygame
+from utils import resource_path
 
 
 class Explosion(pygame.sprite.Sprite):
@@ -32,7 +33,7 @@ class Explosion(pygame.sprite.Sprite):
         explosion_animation['sm'] = []
         for i in range(9):
             filename = 'regularExplosion0{}.png'.format(i)
-            img = pygame.image.load('media/Explosions/' + filename).convert()
+            img = pygame.image.load(resource_path('media/Explosions/' + filename)).convert()
             img.set_colorkey((0, 0, 0))
             img_lg = pygame.transform.scale(img, (75, 75))
             explosion_animation['lg'].append(img_lg)

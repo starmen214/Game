@@ -1,4 +1,5 @@
 import pygame
+import sys
 from button import Button
 from utils import show_text
 
@@ -91,7 +92,7 @@ class Menu:
         ]
 
     def exit_game(self):
-        exit(1)
+        sys.exit(1)
 
     def start_game(self):
         self.choosing_level = True
@@ -139,7 +140,6 @@ class Menu:
                 'Выберите сложность:',
                 (255, 255, 255)
             )
-
 
     def check_mouse_motion(self, pos):
         if not self.choosing_level:

@@ -1,10 +1,11 @@
 import pygame
+from utils import resource_path
 
 
 class Plane(pygame.sprite.Sprite):
     def __init__(self, x, speed, group):
         super().__init__(group)
-        self.image = pygame.image.load("media/plane.png").convert_alpha()
+        self.image = pygame.image.load(resource_path("media/plane.png")).convert_alpha()
         self.rect = self.image.get_rect(center=(x, 440))
         self.speed = speed
         self.can_move = True
