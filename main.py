@@ -16,6 +16,7 @@ pygame.font.init()
 counter_font = pygame.font.SysFont(None, 30)
 lose_font = pygame.font.SysFont(None, 70)
 screen_size = (640, 480)
+bg = pygame.image.load("media/sky.jpg")
 screen = pygame.display.set_mode(screen_size)
 clock = pygame.time.Clock()
 player = pygame.sprite.Group()
@@ -57,7 +58,7 @@ while True:
                 if event.type == pygame.USEREVENT:
                     if plane.alive:
                         create_round(
-                            rounds, plane.rect.x + (plane.rect.width / 2) - 10
+                            rounds, plane.rect.x + (plane.rect.width / 2)
                         )
                 if event.type == SPAWN_ENEMIES_EVENT:
                     if plane.alive:
@@ -79,6 +80,7 @@ while True:
     screen.fill((0, 0, 0))
     if menu.is_started:
         if plane.alive:
+            screen.blit(bg, (0, 0))
             player.draw(screen)
         rounds.draw(screen)
         enemies.draw(screen)

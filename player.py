@@ -25,8 +25,7 @@ class Plane(pygame.sprite.Sprite):
                     self.move_right()
                 else:
                     self.vx = 0
-                if not self.check():
-                    self.rect.x += self.vx
+                self.rect.x += self.vx
 
     def collide_with_enemies(self, enemy_group):
         for enemy in enemy_group:
@@ -36,10 +35,14 @@ class Plane(pygame.sprite.Sprite):
     def move_left(self):
         if self.rect.x > 0:
             self.vx = -self.speed
+        else:
+            self.vx = 0
 
     def move_right(self):
-        if self.rect.x < (320 - self.rect.width):
+        if self.rect.x < (640 - self.rect.width):
             self.vx = self.speed
+        else:
+            self.vx = 0
 
     def check(self):
         if 0 <= self.rect.x <= 640 - self.rect.width:
